@@ -11,5 +11,7 @@
         {% include 'partials/posts.twig' with { posts: section.posts } %}
     {% elseif layout == 'testimonials' %}
         {% include 'partials/testimonials.twig' with { testimonials: section.testimonials } %}
+    {% elseif layout == 'cta' %}
+        {% include 'partials/cta.twig' with { section } %}
     {% endif %}
 {% endfor %}
