@@ -9,5 +9,7 @@
         {% include 'partials/form.twig' with { section } %}
     {% elseif layout == 'posts' %}
         {% include 'partials/posts.twig' with { posts: section.posts } %}
+    {% elseif layout == 'testimonials' %}
+        {% include 'partials/testimonials.twig' with { testimonials: section.testimonials } %}
     {% endif %}
 {% endfor %}
