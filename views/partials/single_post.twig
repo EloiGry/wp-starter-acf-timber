@@ -1,0 +1,5 @@
+<section>
+    <img src="{{ function('get_the_post_thumbnail_url', post.ID, 'full') }}" alt="{{ post.title }}">
+    <h1> {{ post.post_title}}</h1>
+    <p class="text-center mb-12">{{  post.post_content }}</p>
+</section>

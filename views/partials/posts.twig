@@ -1,0 +1,22 @@
+<section class="py-12">
+    <div class="max-w-7xl mx-auto px-4">
+        <h2 class="text-2xl font-bold text-center mb-6">{{ section.title }}</h2>
+        <p class="text-center mb-12">{{ section.description }}</p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {% for post in posts %}
+                <div class="bg-white rounded-lg overflow-hidden">
+                    <a href="{{ post.guid }}" class="block">
+                        <img src="{{ function('get_the_post_thumbnail_url', post.ID, 'full') }}" alt="{{ post.title }}">
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold text-gray-800 mb-2">{{ post.post_title }}</h3>
+                            <p class="text-gray-600">{{ post.post_excerpt ? post.post_excerpt : post.post_content }}</p>
+                        </div>
+                    </a>
+                </div>
+            {% else %}
+                <p class="col-span-3 text-center text-gray-500">Aucun article disponible.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>

@@ -1,0 +1,49 @@
+{% if menu %}
+<div x-data="{ showMenu: false }" @click.outside="showMenu = false" class="flex justify-between items-center relative min-h-20">
+    <!-- Brand -->
+    <a href="#" class="flex items-center cursor-pointer">
+        <img class="bg-black p-2" src="{{ function('wp_get_attachment_image_url', function('get_theme_mod', 'custom_logo'), 'full') }}" alt="Logo">
+    </a>
+
+    <!-- Navbar Toggle Button -->
+    <button @click="showMenu = !showMenu" class="text-gray-700 rounded hover:border focus:border focus:bg-gray-100 p-2 cursor-pointer" type="button">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+        </svg>
+    </button>
+
+    <!-- Nav Links -->
+    <ul class="text-gray-700 text-base origin-top border-b bg-white z-10 w-full"
+        :class="{ 'block absolute top-20': showMenu, 'hidden': !showMenu }"
+        x-cloak>
+        
+        {% for item in items %}
+            <!-- Vérifier si l'élément a des enfants -->
+            {% if item.children %}
+                <li class="cursor-pointer flex flex-col hover:text-gray-800 relative py-2 px-4" x-data="{ open: false }">
+                    <div class="flex justify-between items-center w-full" @click="open = !open">
+                        <a target="{{ item.target }}" href="{{ item.link }}">{{ item.title }}</a>
+                        <svg class="w-4 h-4 transform transition-transform duration-200" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <!-- Sous-menu -->
+                    <ul class="ml-2"
+                        :class="{ 'block': open, 'hidden': !open }"
+                        x-cloak>
+                        {% for child in item.children %}
+                            <li class="py-1">
+                                <a target="{{ child.target }}" href="{{ child.link }}">{{ child.title }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% else %}
+                <li class="cursor-pointer flex items-center hover:text-gray-800 py-2 px-4">
+                    <a target="{{ item.target }}" href="{{ item.link }}">{{ item.title }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}

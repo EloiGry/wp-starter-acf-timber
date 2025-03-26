@@ -1,0 +1,9 @@
+{% if section %}
+<section> 
+    <h2>{{section.title}}</h2>
+    <p> {{section.description}} </p>
+    <div class="contact-form">
+        {{ section.form_shortcode | shortcodes | raw }}
+    </div>
+</section>
+{% endif %}

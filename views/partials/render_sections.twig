@@ -1,0 +1,13 @@
+{% for section in sections %}
+    {% set layout = section.acf_fc_layout %}
+
+    {% if layout == 'hero' %}
+        {% include 'partials/hero.twig' with { section } %}
+    {% elseif layout == 'faq' %}
+        {% include 'partials/faq.twig' with { faq: section.faq } %}
+    {% elseif layout == 'form' %}
+        {% include 'partials/form.twig' with { section } %}
+    {% elseif layout == 'posts' %}
+        {% include 'partials/posts.twig' with { posts: section.posts } %}
+    {% endif %}
+{% endfor %}

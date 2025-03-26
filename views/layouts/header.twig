@@ -1,0 +1,31 @@
+{% if menu %}
+  <img class="bg-black p-2" src="{{ function('wp_get_attachment_image_url', function('get_theme_mod', 'custom_logo'), 'full') }}" alt="Logo">
+  <ul class="flex justify-center gap-2">
+    {% for item in items %}
+      <li class="relative" x-data="{ open: false }" @mouseover="open = true" @mouseleave="open = false">
+        <div class="flex items-center">
+          <a target="{{ item.target }}" href="{{ item.link }}" class="p-2">{{ item.title }}</a>
+
+          {% if item.children %}
+            <!-- Chevron animé -->
+            <svg class="w-4 h-4 transition-transform duration-200" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          {% endif %}
+        </div>
+
+        {% if item.children %}
+          <div x-show="open" x-transition class="absolute left-0 mt-1 z-10 bg-white border border-black rounded-xs shadow-lg w-full">
+            <ul class="flex flex-col divide-y divide-black">
+              {% for child in item.children %}
+                <li>
+                  <a target="{{ child.target }}" href="{{ child.link }}" class="block p-2">{{ child.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}

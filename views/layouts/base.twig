@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html {{ site.language_attributes }}>
+<head>
+    <meta charset="{{ site.charset }}" />
+    <link rel="stylesheet" href="{{ site.theme.link }}/style.css" type="text/css" media="screen" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+    {% do action('get_header') %}
+    {{ function('wp_head') }}
+</head>
+<header>
+            {% block header %}
+                    <nav class="hidden md:flex justify-between items-center">
+                        {% include 'layouts/header.twig' with {
+                            items: menu.get_items
+                        } %}
+                    </nav>
+                    <nav class="md:hidden">
+                        {% include 'layouts/header-mobile.twig' with {
+                            items: menu.get_items
+                        } %}
+                    </nav>
+                    <!-- #nav -->
+            {% endblock %}
+        </header>
+    <body class="container">
+        <main>
+        {% block content %}
+            {% include 'partials/render_sections.twig' with { sections: sections } %}
+        {% endblock %}
+    </main>
+    </body>
+</html>
+

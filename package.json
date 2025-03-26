@@ -1,0 +1,21 @@
+{
+  "name": "my-theme",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "watch:tailwind": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch",
+    "watch:bs": "browser-sync start --proxy \"http://localhost:8882/\" --files \"**/*\" --no-notify",
+    "start": "npm-run-all --parallel watch:tailwind watch:bs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@tailwindcss/cli": "^4.0.15",
+    "browser-sync": "^3.0.3",
+    "npm-run-all": "^4.1.5",
+    "tailwindcss": "^4.0.15"
+  }
+}
