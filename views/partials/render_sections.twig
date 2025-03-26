@@ -1,17 +1,4 @@
 {% for section in sections %}
-    {% set layout = section.acf_fc_layout %}
-
-    {% if layout == 'hero' %}
-        {% include 'partials/hero.twig' with { section } %}
-    {% elseif layout == 'faq' %}
-        {% include 'partials/faq.twig' with { faq: section.faq } %}
-    {% elseif layout == 'form' %}
-        {% include 'partials/form.twig' with { section } %}
-    {% elseif layout == 'posts' %}
-        {% include 'partials/posts.twig' with { posts: section.posts } %}
-    {% elseif layout == 'testimonials' %}
-        {% include 'partials/testimonials.twig' with { testimonials: section.testimonials } %}
-    {% elseif layout == 'cta' %}
-        {% include 'partials/cta.twig' with { section } %}
-    {% endif %}
+ {# {% set layout = section.acf_fc_layout %} #}
+    {% include 'partials/' ~ section.acf_fc_layout ~ '.twig' with { section: section } %}
 {% endfor %}
