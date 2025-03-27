@@ -27,9 +27,12 @@
     <body class="container">
         <main>
         {% block content %}
-            {% include 'partials/render_sections.twig' with { sections: sections } %}
+            {% include 'partials/render_sections.twig' with { sections } %}
         {% endblock %}
     </main>
     </body>
+    {% block footer %}
+            {% include 'layouts/footer.twig'  with { footer } %}
+    {% endblock %}
 </html>
 

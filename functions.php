@@ -6,17 +6,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 // Initialize Timber.
 use Timber\Timber;
-use Timber\Image;
 Timber::init();
-
-
-
-
-function add_to_context($context) {
-    $context['menu'] = Timber::get_menu('main-menu');
-    return $context;
-}
-add_filter('timber/context', 'add_to_context');
 
 // CSS
 
@@ -38,9 +28,19 @@ function my_theme_setup() {
     // Ajouter les menus
     register_nav_menus([
         'main-menu' => __('Menu Principal', 'my-theme'),
+        'footer-menu' => __('Menu Footer', 'my-theme'),
     ]);
 }
 add_action('after_setup_theme', 'my_theme_setup');
+
+// Add menus to context
+
+function add_to_context($context) {
+    $context['menu'] = Timber::get_menu('main-menu');
+    $context['footer'] = Timber::get_menu('footer-menu');
+    return $context;
+}
+add_filter('timber/context', 'add_to_context');
 
 // Remove WYSIWYG editor for pages
 function disable_wysiwyg_for_pages() {
