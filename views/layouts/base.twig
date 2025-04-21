@@ -4,35 +4,56 @@
     <meta charset="{{ site.charset }}" />
     <link rel="stylesheet" href="{{ site.theme.link }}/style.css" type="text/css" media="screen" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- AlpineJS -->
+    <script defer src="{{ site.theme.link }}/src/js/cart.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+
     {% do action('get_header') %}
     {{ function('wp_head') }}
 </head>
-<header>
-            {% block header %}
-                    <nav class="hidden md:flex justify-between items-center">
-                        {% include 'layouts/header.twig' with {
-                            items: menu.get_items
-                        } %}
-                    </nav>
-                    <nav class="md:hidden">
-                        {% include 'layouts/header-mobile.twig' with {
-                            items: menu.get_items
-                        } %}
-                    </nav>
-                    <!-- #nav -->
-            {% endblock %}
-        </header>
-    <body class="container">
-        <main>
+<body>
+    <header>
+        {% block header %}
+            <nav class="w-full hidden md:flex justify-between items-center fixed bg-white z-30 py-4">
+                {% include 'layouts/header.twig' with { items: menu.get_items } %}
+                <div x-data class="relative">
+  <button @click="window.location.href='/panier'" class="relative m-4 cursor-pointer">
+    <!-- Icône panier simple -->
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 text-gray-800" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.2 6h12.4M7 13L5.4 5M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z" />
+    </svg>
+
+    <!-- Badge nombre d'articles -->
+    <template x-if="$store.cart.cart.items.length">
+      <span
+        class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center"
+        x-text="$store.cart.cart.items.length"></span>
+    </template>
+  </button>
+</div>
+            </nav>
+            <nav class="w-full md:hidden">
+                {% include 'layouts/header-mobile.twig' with { items: menu.get_items } %}
+            </nav>
+        {% endblock %}
+    </header>
+
+    <main class="min-h-screen container">
         {% block content %}
             {% include 'partials/render_sections.twig' with { sections } %}
         {% endblock %}
     </main>
-    </body>
-    {% block footer %}
-            {% include 'layouts/footer.twig'  with { footer } %}
-    {% endblock %}
-</html>
 
+    {% block footer %}
+        {% include 'layouts/footer.twig' with { footer } %}
+    {% endblock %}
+
+    <!-- Script du panier -->
+    <script defer src="{{ site.theme.link }}/cart.js"></script>
+
+</body>
+</html>

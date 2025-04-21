@@ -1,0 +1,7 @@
+{% extends 'layouts/base.twig' %}
+
+{% block content %}
+<section class="py-8 max-w-[500px] mx-auto">
+        {% include 'partials/product.twig' with { post } %}
+</section>
+{% endblock %}

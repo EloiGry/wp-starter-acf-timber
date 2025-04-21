@@ -1,0 +1,36 @@
+<div class="group relative block overflow-hidden">
+
+  <img
+    src="{{ function('get_the_post_thumbnail_url', post.ID, 'full') }}" alt="{{ post.title }}"
+    class="h-64 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-72"
+  />
+
+  <div class="relative border border-gray-100 bg-white p-6">
+    {% set product = fn('wc_get_product', post.ID) %}
+        {% if product and product.get_price() and product.is_in_stock() %}
+          <p class="mt-1 text-gray-700">  {{ product.get_price_html() | raw }} </p>
+        {% else %}
+            <span class="text-red-500 text-sm">Rupture de stock</span>
+    {% endif %}
+<button @click="alert('Hello World!')" class="cursor-pointer">Say Hi</button>
+    <h3 class="mt-1.5 text-lg font-medium text-gray-900">{{post.post_title}}</h3>
+
+    <p class="mt-1.5 line-clamp-5 text-gray-700">
+      {{post.post_content}}
+    </p>
+    {% set product = fn('wc_get_product', post.ID) %}
+    {% if product %}
+{% endif %}
+        {% if product and product.get_price() and product.is_in_stock() %}
+          <div class="mt-4 flex gap-4">
+<button
+  x-data @click="$store.cart.addItemToCart({{ product.get_id() }}, 1)"
+  type="button"
+  class="cursor-pointer block w-full rounded-sm bg-gray-100 px-4 py-3 text-sm font-medium text-gray-900 transition hover:scale-105"
+>
+  Ajouter au panier
+</button>
+     
+    </div>
+    {% endif %}
+</div>

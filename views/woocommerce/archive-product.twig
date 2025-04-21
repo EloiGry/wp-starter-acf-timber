@@ -1,0 +1,8 @@
+{% extends 'layouts/base.twig' %}
+{% block content %}
+<section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 py-8">
+        {% for post in posts %}
+        {% include 'ui/card.twig' with { post } %}
+    {% endfor %}
+</section>
+{% endblock %}

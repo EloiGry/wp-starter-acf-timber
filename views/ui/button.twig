@@ -1,0 +1,9 @@
+<button 
+    class="{{ class }} 
+           {{ disabled ? 'opacity-50 cursor-not-allowed' : '' }} 
+           {{ active ? 'ring-2 ring-offset-2 ring-black' : '' }}"
+    x-on:click="{{ onClick | default('') }}"
+    {% if disabled %} disabled {% endif %}
+>
+    {{ text }}
+</button>

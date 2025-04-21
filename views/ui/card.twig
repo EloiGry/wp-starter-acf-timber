@@ -1,0 +1,20 @@
+<a href="{{post.guid}}" class="group block bg-gray-50 p-2">
+  <img
+    src="{{ function('get_the_post_thumbnail_url', post.ID, 'full') }}" alt="{{ post.title }}"
+    alt=""
+    class="aspect-square w-full rounded-sm object-cover"
+  />
+
+  <div class="mt-3">
+    <h3 class="font-medium text-gray-900 group-hover:underline group-hover:underline-offset-4">
+      {{post.post_title}}
+    </h3>
+    {% set product = fn('wc_get_product', post.ID) %}
+        {% if product and product.get_price() and product.is_in_stock() %}
+          <p class="mt-1 text-sm text-gray-700">  {{ product.get_price_html() | raw }} </p>
+        {% else %}
+            <span class="text-red-500 text-sm">Rupture de stock</span>
+    {% endif %}
+    {# <p class="mt-1 text-sm text-gray-700">{{ fn('wc_price', fn('get_post_meta', post.ID, '_price', true)) }}</p> #}
+  </div>
+</a>

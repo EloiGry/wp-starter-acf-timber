@@ -4,3 +4,6 @@
     @apply w-[80%] mx-auto;
 }
 
+.added_to_cart {
+    @apply hidden
+}
