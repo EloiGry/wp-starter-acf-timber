@@ -13,7 +13,7 @@ document.addEventListener("alpine:init", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Nonce": window.wpApiSettings.nonce, // Assurez-vous que le nonce est bien défini
+          Nonce: window.wpApiSettings.nonce, // Assurez-vous que le nonce est bien défini
         },
         body: JSON.stringify({
           id: productId,
@@ -21,7 +21,7 @@ document.addEventListener("alpine:init", () => {
           variation: variations, // On envoie les variations si elles sont présentes
         }),
       });
-    
+
       const data = await res.json();
       this.cart = data; // Mise à jour du panier avec les données renvoyées
     },
@@ -31,7 +31,7 @@ document.addEventListener("alpine:init", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Nonce": window.wpApiSettings.nonce,
+          Nonce: window.wpApiSettings.nonce,
         },
         body: JSON.stringify({
           key: itemKey,
@@ -48,7 +48,7 @@ document.addEventListener("alpine:init", () => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Nonce": window.wpApiSettings.nonce,
+          Nonce: window.wpApiSettings.nonce,
         },
         body: JSON.stringify({
           key: itemKey,
@@ -62,4 +62,17 @@ document.addEventListener("alpine:init", () => {
 
   // Charger le panier dès le démarrage
   Alpine.store("cart").getCart();
+
+  // 2. Ajoute un écouteur pour re-synchroniser quand l'onglet redevient visible
+  //    Utile si l'utilisateur a modifié le panier dans un autre onglet/navigateur.
+  document.addEventListener("visibilitychange", () => {
+    // 'visible' signifie que l'onglet est de nouveau actif
+    if (document.visibilityState === "visible") {
+      console.log("Tab became visible, checking cart sync...");
+      Alpine.store("cart").getCart(); // Appelle la méthode de synchronisation
+    }
+  });
 });
+
+// N'oubliez pas d'initialiser AlpineJS si vous l'importez et qu'il n'est pas démarré ailleurs
+// Alpine.start(); // Décommentez si nécessaire

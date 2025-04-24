@@ -4,12 +4,7 @@
     <meta charset="{{ site.charset }}" />
     <link rel="stylesheet" href="{{ site.theme.link }}/style.css" type="text/css" media="screen" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    
-    <!-- AlpineJS -->
-    <script defer src="{{ site.theme.link }}/src/js/cart.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.8/dist/cdn.min.js"></script>
+  
 
     {% do action('get_header') %}
     {{ function('wp_head') }}
@@ -51,9 +46,6 @@
     {% block footer %}
         {% include 'layouts/footer.twig' with { footer } %}
     {% endblock %}
-
-    <!-- Script du panier -->
-    <script defer src="{{ site.theme.link }}/cart.js"></script>
-
+{{ function('wp_footer') }}
 </body>
 </html>

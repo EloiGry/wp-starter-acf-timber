@@ -16,7 +16,19 @@ function my_theme_enqueue_styles() {
 }
 add_action('wp_enqueue_scripts', 'my_theme_enqueue_styles');
 
+// JS
+function votre_theme_enqueue_scripts() {
+    // Enqueue votre script JavaScript buildé
+    wp_enqueue_script(
+        'votre-theme-scripts', // Un handle unique pour votre script
+        get_template_directory_uri() . '/build/js/bundle.js', // L'URL de votre fichier buildé
+        array(), // Dépendances (laissez vide si votre script n'a pas de dépendances spécifiques à WordPress comme jQuery)
+        filemtime(get_template_directory() . '/build/js/bundle.js'), // Versioning basé sur la date de modification du fichier (pour le cache busting)
+        true // Charge le script dans le pied de page (meilleure pratique pour la performance)
+    );
+}
 
+add_action('wp_enqueue_scripts', 'votre_theme_enqueue_scripts');
 // Theme setup/support
 function my_theme_setup() {
     // Ajouter la prise en charge du <title>
@@ -118,12 +130,10 @@ function my_acf_admin_head() {
     
     add_action('acf/input/admin_head', 'my_acf_admin_head');
 
-    function disable_jquery_migrate( $scripts ) {
-        if ( !is_admin() && isset( $scripts->registered['jquery'] ) ) {
-          $scripts->registered['jquery']->deps = array_diff(
-            $scripts->registered['jquery']->deps,
-            ['jquery-migrate']
-          );
+    function desactiver_jquery_frontend() {
+        if ( ! is_admin() ) { // S'assurer que cela n'affecte que le frontend
+            wp_deregister_script('jquery');
+            wp_dequeue_script('jquery');
         }
-      }
-      add_action( 'wp_default_scripts', 'disable_jquery_migrate' );
+    }
+    add_action( 'wp_enqueue_scripts', 'desactiver_jquery_frontend' );

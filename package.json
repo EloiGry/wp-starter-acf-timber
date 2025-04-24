@@ -6,6 +6,8 @@
     "watch:tailwind": "npx @tailwindcss/cli -i ./src/input.css -o ./src/output.css --watch",
     "watch:bs": "browser-sync start --proxy \"http://localhost:8882/\" --files \"**/*\" --no-notify",
     "start": "npm-run-all --parallel watch:tailwind watch:bs",
+    "dev": "esbuild src/js/main.js --bundle --outfile=build/js/bundle.js --sourcemap --watch",
+    "build": "esbuild src/js/main.js --bundle --outfile=build/js/bundle.js --minify",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,9 +15,15 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@alpinejs/collapse": "^3.14.9",
+    "@alpinejs/persist": "^3.14.9",
     "@tailwindcss/cli": "^4.0.15",
+    "alpinejs": "^3.14.9",
     "browser-sync": "^3.0.3",
     "npm-run-all": "^4.1.5",
     "tailwindcss": "^4.0.15"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.3"
   }
 }
