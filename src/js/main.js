@@ -1,13 +1,10 @@
-// src/js/main.js
+import Alpine from "alpinejs";
+import persist from "@alpinejs/persist";
 
-import Alpine from 'alpinejs';
-import './cart'; // Importer le fichier cart.js
+Alpine.plugin(persist); 
 
-// Expose Alpine to the window for potential debugging (optional)
+import "./cart";
+
+
 window.Alpine = Alpine;
-
-// Start Alpine
 Alpine.start();
-
-console.log('Alpine.js est initialisé !');
-console.log('Code du panier chargé.'); // Confirmation que cart.js est bien importé

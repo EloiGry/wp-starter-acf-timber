@@ -1,0 +1,527 @@
+<div id="{{ carousel_id }}" 
+     class="ui-carousel {{ args.class }} {{ args.orientation == 'vertical' ? 'flex flex-col' : '' }}"
+     x-data="carousel({{ alpine_params }})"
+     x-init="init()">
+    
+    <div class="ui-carousel-wrapper relative flex {{ args.orientation == 'vertical' ? 'flex-col h-full' : 'w-full' }}">
+        {# Flèches à l'extérieur (sur les côtés) si configuré ainsi #}
+        {% if args.arrows_position == 'outside' %}
+            <div class="ui-carousel-arrows-outside flex items-center {{ args.orientation == 'vertical' ? 'flex-col h-full' : 'w-full' }} justify-between">
+                <button 
+                    class="ui-carousel-arrow ui-carousel-prev bg-white/70 hover:bg-white text-gray-800 rounded-full p-2 shadow-md transition z-10"
+                    x-on:click="prev()"
+                    x-bind:class="{ 'opacity-40 cursor-not-allowed': !canGoPrev() && !infinite }">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 {{ args.orientation == 'vertical' ? 'rotate-90' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                
+                {# Container des slides #}
+                <div class="ui-carousel-container relative overflow-hidden {{ args.orientation == 'vertical' ? 'h-full w-full' : 'w-full' }}">
+                    {# Track des slides #}
+                    <div class="ui-carousel-track flex {{ args.orientation == 'vertical' ? 'flex-col' : 'flex-row' }} transition-all duration-300"
+                         x-bind:style="trackStyle()"
+                         style="gap: {{ args.gap|default(0) }}px;">
+                        
+                        {# Slides #}
+                        {% for item in args.items %}
+                            <div class="ui-carousel-slide flex-shrink-0 {{ args.transition == 'fade' ? 'absolute inset-0 opacity-0 transition-opacity duration-300' : '' }}"
+                                 x-bind:style="slideStyle({{ loop.index0 }})"
+                                 x-bind:class="slideClasses({{ loop.index0 }})">
+                                {{ item|raw }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <button 
+                    class="ui-carousel-arrow ui-carousel-next bg-white/70 hover:bg-white text-gray-800 rounded-full p-2 shadow-md transition z-10"
+                    x-on:click="next()"
+                    x-bind:class="{ 'opacity-40 cursor-not-allowed': !canGoNext() && !infinite }">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 {{ args.orientation == 'vertical' ? 'rotate-90' : '' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+            </div>
+        {% else %}
+            {# Container des slides #}
+            <div class="ui-carousel-container relative overflow-hidden {{ args.orientation == 'vertical' ? 'h-full w-full' : 'w-full' }}">
+                {# Flèches latérales #}
+                {% if args.arrows_position == 'sides' %}
+                    <button 
+                        class="ui-carousel-arrow ui-carousel-prev absolute {{ args.orientation == 'vertical' ? 'top-2 left-1/2 transform -translate-x-1/2 rotate-90' : 'left-2 top-1/2 transform -translate-y-1/2' }} z-10 bg-white/70 hover:bg-white text-gray-800 rounded-full p-2 shadow-md transition"
+                        x-on:click="prev()"
+                        x-bind:class="{ 'opacity-40 cursor-not-allowed': !canGoPrev() && !infinite }">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
+                    
+                    <button 
+                        class="ui-carousel-arrow ui-carousel-next absolute {{ args.orientation == 'vertical' ? 'bottom-2 left-1/2 transform -translate-x-1/2 rotate-90' : 'right-2 top-1/2 transform -translate-y-1/2' }} z-10 bg-white/70 hover:bg-white text-gray-800 rounded-full p-2 shadow-md transition"
+                        x-on:click="next()"
+                        x-bind:class="{ 'opacity-40 cursor-not-allowed': !canGoNext() && !infinite }">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                {% endif %}
+                
+                {# Track des slides #}
+                <div class="ui-carousel-track flex {{ args.orientation == 'vertical' ? 'flex-col' : 'flex-row' }} transition-all duration-300"
+                     x-bind:style="trackStyle()"
+                     style="gap: {{ args.gap|default(0) }}px;">
+                    
+                    {# Slides #}
+                    {% for item in args.items %}
+                        <div class="ui-carousel-slide flex-shrink-0 {{ args.transition == 'fade' ? 'absolute inset-0 opacity-0 transition-opacity duration-300' : '' }}"
+                             x-bind:style="slideStyle({{ loop.index0 }})"
+                             x-bind:class="slideClasses({{ loop.index0 }})">
+                            {{ item|raw }}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+    
+    {# Contrôles inférieurs (flèches + pagination) #}
+    <div class="ui-carousel-controls flex items-center justify-center mt-4 gap-2">
+        {% if args.arrows_position == 'bottom' %}
+            <button 
+                class="ui-carousel-arrow ui-carousel-prev bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-full p-1 transition"
+                x-on:click="prev()"
+                x-bind:class="{ 'opacity-40 cursor-not-allowed': !canGoPrev() && !infinite }">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+        {% endif %}
+        
+        {# Pagination - Complètement recodée #}
+        {% if args.pagination == 'dots' %}
+            <div class="ui-carousel-pagination flex gap-1">
+                <template x-for="(page, index) in calculateDots()" :key="index">
+                    <button 
+                        class="ui-carousel-dot h-2 rounded-full transition-all" 
+                        x-bind:class="{ 'bg-black w-4': currentPage === index, 'bg-gray-300 w-2': currentPage !== index }"
+                        x-on:click="goToPage(index)"></button>
+                </template>
+            </div>
+        {% elseif args.pagination == 'numbers' %}
+            <div class="ui-carousel-pagination flex">
+                <span class="text-sm font-medium" x-text="`${currentPage + 1} / ${calculateDots().length}`"></span>
+            </div>
+        {% endif %}
+        
+        {% if args.arrows_position == 'bottom' %}
+            <button 
+                class="ui-carousel-arrow ui-carousel-next bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-full p-1 transition"
+                x-on:click="next()"
+                x-bind:class="{ 'opacity-40 cursor-not-allowed': !canGoNext() && !infinite }">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+            </button>
+        {% endif %}
+    </div>
+</div>
+
+{# Script Alpine pour le carousel #}
+<script>
+    function carousel(config) {
+        return {
+            // État principal et configuration
+            currentIndex: config.currentIndex || 0,
+            items: config.items || 0,
+            autoplay: config.autoplay || false,
+            autoplayDelay: config.autoplayDelay || 3000,
+            orientation: config.orientation || 'horizontal',
+            transition: config.transition || 'slide',
+            infinite: config.infinite || false,
+            slidesCount: config.slidesCount || 1,
+            pageStep: config.pageStep || 1,
+            gap: config.gap || 0,
+            autoplayInterval: null,
+            slideElements: [],
+
+            // Propriété calculée pour obtenir les indices de départ que chaque point de pagination représente.
+            // Cette propriété est essentielle pour calculer le nombre total de points et le point actif,
+            // ainsi que pour la navigation par points.
+            get dotStartIndices() {
+                 const totalItems = this.items;
+                 const visibleSlides = this.slidesCount;
+                 const step = this.pageStep;
+                 const startIndices = [];
+
+                 // S'il y a moins d'éléments que de slides visibles, il n'y a qu'une seule vue (index 0).
+                 if (totalItems <= visibleSlides) {
+                     return [0];
+                 }
+
+                 // L'index du dernier élément qui peut être le début d'une vue valide.
+                 const lastPossibleStartIndex = totalItems - visibleSlides;
+
+                 // Ajouter les indices de départ atteints par des pas complets à partir de 0.
+                 // Parcourir jusqu'à (ou juste après) le dernier index de départ possible pour inclure tous les multiples du pas.
+                 for (let i = 0; ; i++) {
+                     const startIndex = i * step;
+                     // Ajouter l'index s'il est une position de départ valide (inférieur ou égal au dernier possible).
+                     if (startIndex <= lastPossibleStartIndex) {
+                          startIndices.push(startIndex);
+                     } else {
+                         // Si l'index calculé dépasse le dernier possible, arrêter la boucle.
+                          break;
+                     }
+                 }
+
+                 // Ajouter l'index de départ de la dernière vue possible s'il n'est pas déjà inclus dans la liste.
+                 // Cela gère les cas où lastPossibleStartIndex n'est pas un multiple du pas.
+                 // S'assure également qu'il y a au moins un indice si totalItems > visibleSlides.
+                 if (lastPossibleStartIndex > 0 && !startIndices.includes(lastPossibleStartIndex)) {
+                      startIndices.push(lastPossibleStartIndex);
+                 }
+                 // Gérer le cas où lastPossibleStartIndex est 0 (items === slidesCount), startIndices doit être [0]
+                 if (totalItems > visibleSlides && lastPossibleStartIndex === 0 && startIndices.length === 0) {
+                     startIndices.push(0);
+                 }
+
+
+                 // S'assurer que les indices sont triés (devraient l'être par la boucle, mais par sécurité).
+                 startIndices.sort((a, b) => a - b);
+
+                 return startIndices;
+            },
+
+            // Calcul du nombre de dots pour la pagination.
+            // Le nombre de dots est égal au nombre d'indices de départ uniques.
+            calculateDots() {
+                // Le nombre de dots est simplement la longueur du tableau dotStartIndices.
+                // S'assurer que dotStartIndices est disponible avant de l'utiliser.
+                return Array(this.dotStartIndices ? this.dotStartIndices.length : 0).fill(null);
+            },
+
+
+            // Cette propriété calculée détermine l'index (0-basé) du point de pagination actif.
+            // Elle utilise le tableau dotStartIndices pour trouver le point correspondant à la vue actuelle.
+            get currentPage() { // Le nom 'currentPage' est conservé comme demandé, il représente l'indice du dot actif.
+                const currentIndex = this.currentIndex;
+                const startIndices = this.dotStartIndices; // Utilise les indices de départ calculés
+
+                 // Si dotStartIndices n'est pas encore calculé ou est vide, retourner 0 par défaut.
+                 if (!startIndices || startIndices.length === 0) {
+                     return 0;
+                 }
+
+
+                // Trouver l'index dans le tableau dotStartIndices qui est le plus grand
+                // mais pas supérieur à currentIndex. C'est l'indice du point actif.
+                let activeIndex = 0;
+                for (let i = 0; i < startIndices.length; i++) {
+                    // Si l'indice de départ actuel est <= currentIndex, ce point peut être actif.
+                    // On garde son index. Comme la liste est triée, le dernier index
+                    // qui satisfait cette condition est le bon.
+                    if (startIndices[i] <= currentIndex) {
+                        activeIndex = i;
+                    } else {
+                         // Dès que l'indice de départ devient supérieur à currentIndex,
+                         // on a dépassé l'indice de départ du point actif.
+                         break;
+                    }
+                }
+
+                // currentPage retourne l'indice (0-basé) du point de pagination actif.
+                return activeIndex;
+            },
+
+            init() {
+                // Collecter les éléments de slide pour manipulation directe
+                this.slideElements = this.$el.querySelectorAll('.ui-carousel-slide');
+
+                // Appliquer les configurations initiales
+                if (this.orientation === 'vertical') {
+                    this.applyVerticalLayout();
+                }
+
+                if (this.autoplay) {
+                    this.startAutoplay();
+                }
+
+                // Gestion des événements tactiles
+                const container = this.$el.querySelector('.ui-carousel-container');
+                let startX, startY;
+
+                container.addEventListener('touchstart', (e) => {
+                    startX = e.touches[0].clientX;
+                    startY = e.touches[0].clientY;
+                });
+
+                container.addEventListener('touchend', (e) => {
+                    const endX = e.changedTouches[0].clientX;
+                    const endY = e.changedTouches[0].clientY;
+
+                    const diffX = startX - endX;
+                    const diffY = startY - endY;
+
+                    if (this.orientation === 'horizontal') {
+                        if (Math.abs(diffX) > 50) {
+                            if (diffX > 0) {
+                                this.next();
+                            } else {
+                                this.prev();
+                            }
+                        }
+                    } else {
+                        if (Math.abs(diffY) > 50) {
+                            if (diffY > 0) {
+                                this.next();
+                            } else {
+                                this.prev();
+                            }
+                        }
+                    }
+                });
+            },
+
+            // Gestion spécifique pour le mode vertical
+            applyVerticalLayout() {
+                if (this.transition !== 'fade') {
+                    // Assurez-vous que les slides ont la bonne hauteur
+                    this.slideElements.forEach((slide, index) => {
+                        const gapAdjustment = (this.gap * (this.slidesCount - 1)) / this.slidesCount;
+                        const height = `calc(${100/this.slidesCount}% - ${gapAdjustment}px)`;
+                        slide.style.height = height;
+                    });
+                }
+            },
+
+            startAutoplay() {
+                this.autoplayInterval = setInterval(() => {
+                    this.next();
+                }, this.autoplayDelay);
+            },
+
+            stopAutoplay() {
+                if (this.autoplayInterval) {
+                    clearInterval(this.autoplayInterval);
+                }
+            },
+
+            // Gère la taille des slides individuels
+            slideStyle(index) {
+                if (this.transition === 'fade') {
+                    return {};
+                }
+
+                const style = {};
+
+                // Calcul des dimensions selon l'orientation
+                if (this.orientation === 'horizontal') {
+                     const gapAdjustment = (this.gap * (this.slidesCount - 1)) / this.slidesCount;
+                     style.width = `calc(${100 / this.slidesCount}% - ${gapAdjustment}px)`;
+                }
+
+                if (this.orientation === 'vertical') {
+                    style.display = this.isActive(index) ? 'block' : 'none';
+                }
+
+                return style;
+            },
+
+            // Gère le déplacement du track
+            trackStyle() {
+                if (this.transition === 'fade') {
+                    return {};
+                }
+
+                let effectiveIndex = this.currentIndex;
+
+                if (this.orientation === 'horizontal') {
+                    const percentageBase = 100 / this.slidesCount;
+                    const percentageOffset = percentageBase * effectiveIndex;
+                    const pixelGapPerItem = this.gap / this.slidesCount;
+                    const pixelOffset = pixelGapPerItem * effectiveIndex;
+
+                    return {
+                        transform: `translateX(calc(-${percentageOffset}% - ${pixelOffset}px))`
+                    };
+                } else {
+                    return {};
+                }
+            },
+
+            // Définit les classes conditionnelles pour les slides
+            slideClasses(index) {
+                if (this.transition === 'fade') {
+                    const isActive = this.isActive(index);
+                    return {
+                        'opacity-100 z-10': isActive,
+                        'opacity-0 z-0': !isActive,
+                         // Assuming a fade transition class, adjust as needed
+                        'transition-opacity duration-500 ease-in-out': true
+                    };
+                }
+                 return {};
+            },
+
+             // Détermine si un slide est actif (visible dans la vue actuelle)
+             isActive(index) {
+                return index >= this.currentIndex && index < this.currentIndex + this.slidesCount;
+            },
+
+             // Détermine si le bouton "Précédent" doit être activé
+             canGoPrev() {
+                 // On peut revenir en arrière si l'index courant n'est pas le premier indice de départ (0).
+                 // Utilise dotStartIndices pour une vérification précise.
+                 // S'assure que dotStartIndices est disponible.
+                 return this.dotStartIndices && this.dotStartIndices.length > 0 ? this.currentIndex > this.dotStartIndices[0] : this.currentIndex > 0;
+             },
+
+             // Détermine si le bouton "Suivant" doit être activé
+             canGoNext() {
+                 // On peut aller au suivant si l'index courant n'est pas le dernier indice de départ possible.
+                 // Utilise dotStartIndices pour une vérification précise.
+                 // S'assure que dotStartIndices est disponible.
+                 return this.dotStartIndices && this.dotStartIndices.length > 0 ? this.currentIndex < this.dotStartIndices[this.dotStartIndices.length - 1] : this.currentIndex + this.slidesCount < this.items;
+             },
+
+
+            // Navigue vers la vue précédente, en s'alignant sur l'indice de départ du point précédent.
+            prev() {
+                // S'assurer que dotStartIndices est disponible avant de naviguer.
+                if (!this.dotStartIndices || this.dotStartIndices.length === 0) {
+                    return;
+                }
+
+                if (this.canGoPrev()) {
+                    // Trouver l'index du point actuellement actif en utilisant la propriété currentPage.
+                    const currentDotIndex = this.currentPage; // currentPage retourne l'indice du dot actif.
+
+                    // L'indice du point vers lequel on veut naviguer est l'indice du point actuel moins 1.
+                    // S'assurer que l'indice du point précédent n'est pas négatif.
+                    const previousDotIndex = Math.max(0, currentDotIndex - 1);
+
+                    // Utiliser le tableau dotStartIndices pour trouver l'indice de départ correspondant à ce point précédent.
+                    // S'assurer que previousDotIndex est un index valide pour le tableau dotStartIndices.
+                    const targetIndex = this.dotStartIndices[previousDotIndex];
+
+                    // Naviguer vers cet indice de départ cible.
+                    this.goTo(targetIndex);
+
+                } else if (this.infinite) {
+                    // Mode infini : retour à la toute dernière vue possible.
+                    // L'indice de départ de la dernière vue est le dernier élément de dotStartIndices.
+                    // S'assurer que dotStartIndices existe et n'est pas vide (déjà vérifié au début).
+                    const lastPossibleStartIndex = this.dotStartIndices[this.dotStartIndices.length - 1];
+
+                    this.goTo(lastPossibleStartIndex);
+                }
+
+                // Le reste de la fonction (mise à jour verticale, autoplay) reste inchangé.
+                if (this.orientation === 'vertical') {
+                     this.updateVerticalSlides();
+                }
+
+                if (this.autoplay) {
+                    this.stopAutoplay();
+                    this.startAutoplay();
+                }
+            },
+
+            // Navigue vers la vue suivante, en s'alignant sur l'indice de départ du point suivant.
+            next() {
+                 // S'assurer que dotStartIndices est disponible avant de naviguer.
+                 if (!this.dotStartIndices || this.dotStartIndices.length === 0) {
+                     return;
+                 }
+
+                 if (this.canGoNext()) {
+                     // Trouver l'index du point actuellement actif en utilisant la propriété currentPage.
+                     const currentDotIndex = this.currentPage; // currentPage est l'indice du dot actif.
+
+                     // L'indice du point vers lequel on veut naviguer est l'indice du point actuel plus 1.
+                     const nextDotIndex = currentDotIndex + 1;
+
+                     // Utiliser le tableau dotStartIndices pour trouver l'indice de départ correspondant à ce point suivant.
+                     // S'assurer que nextDotIndex est un index valide pour le tableau dotStartIndices.
+                     // Si on dépasse le dernier index de dotStartIndices, naviguer vers le dernier indice de départ possible.
+                     const targetIndex = (nextDotIndex < this.dotStartIndices.length) ? this.dotStartIndices[nextDotIndex] : this.dotStartIndices[this.dotStartIndices.length - 1];
+
+
+                     // Naviguer vers cet indice de départ cible.
+                     this.goTo(targetIndex);
+
+                 } else if (this.infinite) {
+                     // Mode infini : retour à la première vue possible (indice 0).
+                     this.goTo(0);
+                 }
+
+                // Le reste de la fonction (mise à jour verticale, autoplay) reste inchangé.
+                if (this.orientation === 'vertical') {
+                     this.updateVerticalSlides();
+                }
+
+                if (this.autoplay) {
+                    this.stopAutoplay();
+                    this.startAutoplay();
+                }
+            },
+
+            // Gestion spécifique pour les slides verticaux
+            updateVerticalSlides() {
+                // Si nous sommes en mode vertical et pas en fade, mettre à jour la visibilité des slides
+                if (this.orientation === 'vertical' && this.transition !== 'fade') {
+                    this.slideElements.forEach((slide, index) => {
+                        const isVisible = this.isActive(index);
+                        slide.style.display = isVisible ? 'block' : 'none';
+                    });
+                }
+            },
+
+            // Navigation vers un index spécifique
+            goTo(index) {
+                // Ensure the target index is within the valid range [0, lastPossibleStartIndex]
+                // Note: goTo is often called with a target index already within the valid range
+                // by prev, next, or goToPage, but this provides a safety check.
+                const maxIndex = Math.max(0, this.items - this.slidesCount);
+                this.currentIndex = Math.max(0, Math.min(maxIndex, index));
+
+                // Trigger updates for vertical layout visibility if needed
+                if (this.orientation === 'vertical') {
+                     this.updateVerticalSlides();
+                }
+
+                // Restart autoplay after manual navigation
+                if (this.autoplay) {
+                    this.stopAutoplay();
+                    this.startAutoplay();
+                }
+            },
+
+            // Navigation vers une page spécifique (pour pagination dots/numbers)
+            // 'dotIndex' est l'index du point cliqué (0, 1, 2, ...)
+            goToPage(dotIndex) {
+                // S'assurer que dotStartIndices est disponible et que l'index du point est valide.
+                 if (!this.dotStartIndices || dotIndex < 0 || dotIndex >= this.dotStartIndices.length) {
+                     return;
+                 }
+                // Utilise le tableau dotStartIndices pour trouver l'index de départ correspondant au point cliqué.
+                const targetIndex = this.dotStartIndices[dotIndex];
+                this.goTo(targetIndex);
+            },
+
+            // Calcul du style pour les dots de pagination
+            // L'index du point actif est déterminé par la propriété calculée currentPage.
+            dotStyle(index) {
+                // currentPage contient maintenant l'indice du point de pagination actif.
+                return {
+                    width: this.currentPage === index ? '8px' : '6px',
+                    height: this.currentPage === index ? '8px' : '6px',
+                    backgroundColor: this.currentPage === index ? '#3b82f6' : '#d1d5db',
+                    borderRadius: '50%',
+                    margin: '0 4px'
+                };
+            }
+        };
+    }
+</script>

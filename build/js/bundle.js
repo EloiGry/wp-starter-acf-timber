@@ -3281,10 +3281,72 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
   var src_default = alpine_default;
   var module_default = src_default;
 
+  // node_modules/@alpinejs/persist/dist/module.esm.js
+  function src_default2(Alpine3) {
+    let persist = () => {
+      let alias;
+      let storage;
+      try {
+        storage = localStorage;
+      } catch (e) {
+        console.error(e);
+        console.warn("Alpine: $persist is using temporary storage since localStorage is unavailable.");
+        let dummy = /* @__PURE__ */ new Map();
+        storage = {
+          getItem: dummy.get.bind(dummy),
+          setItem: dummy.set.bind(dummy)
+        };
+      }
+      return Alpine3.interceptor((initialValue, getter, setter, path, key) => {
+        let lookup = alias || `_x_${path}`;
+        let initial = storageHas(lookup, storage) ? storageGet(lookup, storage) : initialValue;
+        setter(initial);
+        Alpine3.effect(() => {
+          let value = getter();
+          storageSet(lookup, value, storage);
+          setter(value);
+        });
+        return initial;
+      }, (func) => {
+        func.as = (key) => {
+          alias = key;
+          return func;
+        }, func.using = (target) => {
+          storage = target;
+          return func;
+        };
+      });
+    };
+    Object.defineProperty(Alpine3, "$persist", { get: () => persist() });
+    Alpine3.magic("persist", persist);
+    Alpine3.persist = (key, { get: get3, set: set3 }, storage = localStorage) => {
+      let initial = storageHas(key, storage) ? storageGet(key, storage) : get3();
+      set3(initial);
+      Alpine3.effect(() => {
+        let value = get3();
+        storageSet(key, value, storage);
+        set3(value);
+      });
+    };
+  }
+  function storageHas(key, storage) {
+    return storage.getItem(key) !== null;
+  }
+  function storageGet(key, storage) {
+    let value = storage.getItem(key, storage);
+    if (value === void 0)
+      return;
+    return JSON.parse(value);
+  }
+  function storageSet(key, value, storage) {
+    storage.setItem(key, JSON.stringify(value));
+  }
+  var module_default2 = src_default2;
+
   // src/js/cart.js
   document.addEventListener("alpine:init", () => {
     Alpine.store("cart", {
-      cart: { items: [], totals: {} },
+      cart: Alpine.$persist({ items: [], totals: {} }).as("cart"),
       async getCart() {
         const res = await fetch("/wp-json/wc/store/cart");
         const data2 = await res.json();
@@ -3348,9 +3410,8 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
   });
 
   // src/js/main.js
+  module_default.plugin(module_default2);
   window.Alpine = module_default;
   module_default.start();
-  console.log("Alpine.js est initialis\xE9 !");
-  console.log("Code du panier charg\xE9.");
 })();
 //# sourceMappingURL=bundle.js.map

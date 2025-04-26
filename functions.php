@@ -137,3 +137,51 @@ function my_acf_admin_head() {
         }
     }
     add_action( 'wp_enqueue_scripts', 'desactiver_jquery_frontend' );
+
+    // Fonction pour trouver et inclure tous les fichiers *-render.php
+function include_all_component_render_files() {
+    $components_base_dir = get_template_directory() . '/views/ui/';
+    if ( ! is_dir( $components_base_dir ) ) {
+        return;
+    }
+
+    // Utilise un itérateur récursif pour chercher dans les sous-dossiers
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator( $components_base_dir, RecursiveDirectoryIterator::SKIP_DOTS ), // SKIP_DOTS pour ignorer '.' et '..'
+        RecursiveIteratorIterator::LEAVES_ONLY // Ne traiter que les fichiers
+    );
+
+    foreach ( $iterator as $file ) {
+        // Vérifie que c'est un fichier PHP et qu'il finit par '-render.php'
+        if ( $file->isFile() && $file->getExtension() === 'php' && str_ends_with( $file->getFilename(), '-render.php' ) ) {
+            require_once $file->getRealPath();
+        }
+    }
+}
+
+// Inclure tous les fichiers render au bon moment
+add_action( 'after_setup_theme', 'include_all_component_render_files' ); // Ou 'init' si nécessaire
+
+// Ajouter les fonctions de rendu à Twig
+add_filter( 'timber/twig', 'add_all_component_renderers_to_twig' );
+
+function add_all_component_renderers_to_twig( \Twig\Environment $twig ) {
+    // Récupère toutes les fonctions définies par l'utilisateur après l'inclusion des fichiers
+    $user_functions = get_defined_functions()['user'];
+
+    foreach ( $user_functions as $function_name ) {
+        // Définit une convention de nommage claire pour vos renderers, par exemple 'render_component_[nom]'
+        // ou simplement vérifier si la fonction existe (moins sûr si d'autres plugins définissent des fonctions similaires)
+        // Ici, on suppose que toutes les fonctions chargées par `include_all_component_render_files` sont destinées à Twig.
+        // C'est pourquoi il est important que seuls les fichiers `*-render.php` définissent ces fonctions.
+         if (strpos($function_name, 'render_') === 0) { // Exemple: toutes les fonctions qui commencent par 'render_'
+            $twig->addFunction( new \Twig\TwigFunction( $function_name, $function_name ) );
+         }
+         // Convention plus stricte si nécessaire:
+         // if (strpos($function_name, 'render_component_') === 0 || strpos($function_name, 'render_primitive_') === 0) {
+         //     $twig->addFunction( new \Twig\TwigFunction( $function_name, $function_name ) );
+         // }
+    }
+
+    return $twig;
+}

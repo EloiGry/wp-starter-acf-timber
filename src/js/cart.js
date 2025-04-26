@@ -1,6 +1,6 @@
 document.addEventListener("alpine:init", () => {
   Alpine.store("cart", {
-    cart: { items: [], totals: {} },
+    cart: Alpine.$persist({ items: [], totals: {} }).as("cart"),
 
     async getCart() {
       const res = await fetch("/wp-json/wc/store/cart");
@@ -74,5 +74,4 @@ document.addEventListener("alpine:init", () => {
   });
 });
 
-// N'oubliez pas d'initialiser AlpineJS si vous l'importez et qu'il n'est pas démarré ailleurs
-// Alpine.start(); // Décommentez si nécessaire
+
